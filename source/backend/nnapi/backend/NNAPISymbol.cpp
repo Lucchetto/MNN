@@ -46,6 +46,7 @@ bool loadNNAPISymbol() {
     LOAD_SYM(ANeuralNetworksModel_setOperandSymmPerChannelQuantParams, 29);
     LOAD_SYM(ANeuralNetworksModel_addOperation, 27);
     LOAD_SYM(ANeuralNetworksModel_identifyInputsAndOutputs, 27);
+    LOAD_SYM(ANeuralNetworksModel_relaxComputationFloat32toFloat16, 28);
     LOAD_SYM(ANeuralNetworksCompilation_create, 27);
     LOAD_SYM(ANeuralNetworksCompilation_free, 27);
     LOAD_SYM(ANeuralNetworksCompilation_setPreference, 27);
@@ -85,6 +86,7 @@ MNN_ANeuralNetworksModel_setOperandValue *ANeuralNetworksModel_setOperandValue_2
 MNN_ANeuralNetworksModel_setOperandSymmPerChannelQuantParams *ANeuralNetworksModel_setOperandSymmPerChannelQuantParams_29;
 MNN_ANeuralNetworksModel_addOperation *ANeuralNetworksModel_addOperation_27 = nullptr;
 MNN_ANeuralNetworksModel_identifyInputsAndOutputs *ANeuralNetworksModel_identifyInputsAndOutputs_27 = nullptr;
+MNN_ANeuralNetworksModel_relaxComputationFloat32toFloat16 *ANeuralNetworksModel_relaxComputationFloat32toFloat16_28 = nullptr;
 MNN_ANeuralNetworksCompilation_create *ANeuralNetworksCompilation_create_27 = nullptr;
 MNN_ANeuralNetworksCompilation_free *ANeuralNetworksCompilation_free_27 = nullptr;
 MNN_ANeuralNetworksCompilation_setPreference *ANeuralNetworksCompilation_setPreference_27 = nullptr;

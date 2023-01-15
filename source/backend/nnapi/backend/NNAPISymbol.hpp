@@ -30,6 +30,7 @@ typedef int (MNN_ANeuralNetworksModel_setOperandValue)(ANeuralNetworksModel* mod
 typedef int (MNN_ANeuralNetworksModel_setOperandSymmPerChannelQuantParams)(ANeuralNetworksModel* model, int32_t index, const ANeuralNetworksSymmPerChannelQuantParams* channelQuant);
 typedef int (MNN_ANeuralNetworksModel_addOperation)(ANeuralNetworksModel* model, ANeuralNetworksOperationType type, uint32_t inputCount, const uint32_t* inputs, uint32_t outputCount, const uint32_t* outputs);
 typedef int (MNN_ANeuralNetworksModel_identifyInputsAndOutputs)(ANeuralNetworksModel* model, uint32_t inputCount, const uint32_t* inputs, uint32_t outputCount, const uint32_t* outputs);
+typedef int (MNN_ANeuralNetworksModel_relaxComputationFloat32toFloat16)(ANeuralNetworksModel* model, bool allow);
 typedef int (MNN_ANeuralNetworksCompilation_create)(ANeuralNetworksModel* model, ANeuralNetworksCompilation** compilation);
 typedef void (MNN_ANeuralNetworksCompilation_free)(ANeuralNetworksCompilation* compilation);
 typedef int (MNN_ANeuralNetworksCompilation_setPreference)(ANeuralNetworksCompilation* compilation, int32_t preference);
@@ -70,6 +71,7 @@ extern MNN_ANeuralNetworksModel_setOperandValue *ANeuralNetworksModel_setOperand
 extern MNN_ANeuralNetworksModel_setOperandSymmPerChannelQuantParams *ANeuralNetworksModel_setOperandSymmPerChannelQuantParams_29;
 extern MNN_ANeuralNetworksModel_addOperation *ANeuralNetworksModel_addOperation_27;
 extern MNN_ANeuralNetworksModel_identifyInputsAndOutputs *ANeuralNetworksModel_identifyInputsAndOutputs_27;
+extern MNN_ANeuralNetworksModel_relaxComputationFloat32toFloat16 *ANeuralNetworksModel_relaxComputationFloat32toFloat16_28;
 extern MNN_ANeuralNetworksCompilation_create *ANeuralNetworksCompilation_create_27;
 extern MNN_ANeuralNetworksCompilation_free *ANeuralNetworksCompilation_free_27;
 extern MNN_ANeuralNetworksCompilation_setPreference *ANeuralNetworksCompilation_setPreference_27;
