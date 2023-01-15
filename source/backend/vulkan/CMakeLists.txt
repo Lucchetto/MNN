@@ -17,19 +17,19 @@ IF(MNN_SEP_BUILD)
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "../../../")
     endif()
     add_library(
-        MNN_Vulkan
+        MNN_VK
         SHARED
         ${MNN_Vulkan_SRC}
         )
-    target_link_libraries(MNN_Vulkan MNN)
+    target_link_libraries(MNN_VK MNN)
     if (MNN_USE_SYSTEM_LIB)
-        target_link_libraries(MNN_Vulkan ${Vulkan_LIBRARY})
+        target_link_libraries(MNN_VK ${Vulkan_LIBRARY})
     else()
-        target_link_libraries(MNN_Vulkan dl)
+        target_link_libraries(MNN_VK dl)
     endif()
 ELSE()
     add_library(
-        MNN_Vulkan
+        MNN_VK
         OBJECT
         ${MNN_Vulkan_SRC}
         )
