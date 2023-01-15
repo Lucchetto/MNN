@@ -478,6 +478,7 @@ namespace MNN {
               inputOperands.data(),
               outputOperands.size(),
               outputOperands.data());
+        CHECK(ANeuralNetworksModel_relaxComputationFloat32toFloat16_28, mNNAPIModel, true);
         CHECK(ANeuralNetworksModel_finish_27, mNNAPIModel);
         std::unique_ptr<bool[]> supports(new bool[mOpNames.size()]);
         int selectDeviceIdx = -1;
