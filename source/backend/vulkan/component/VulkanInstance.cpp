@@ -60,14 +60,37 @@ const VkResult VulkanInstance::enumeratePhysicalDevices(uint32_t& physicalDevice
 
 void VulkanInstance::getPhysicalDeviceQueueFamilyProperties(const VkPhysicalDevice& physicalDevice,
                                                             uint32_t& queueFamilyPropertyCount,
-                                                            VkQueueFamilyProperties* pQueueFamilyProperties) {
+                                                            VkQueueFamilyProperties* pQueueFamilyProperties) const {
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyPropertyCount, pQueueFamilyProperties);
 }
 
+bool VulkanInstance::getPhysicalDeviceComputeQueueSupport(const VkPhysicalDevice& physicalDevice) const {
+    // Get count of queues
+    uint32_t queueCount = 0;
+    getPhysicalDeviceQueueFamilyProperties(physicalDevice, queueCount, nullptr);
+    if (queueCount == 0) {
+        return false;
+    }
+
+    // Get actual queues
+    VkQueueFamilyProperties queues[queueCount];
+    getPhysicalDeviceQueueFamilyProperties(physicalDevice, queueCount, queues);
+
+    // Check vulkan compute support
+    for (uint32_t i = 0; i < queueCount; ++queueCount) {
+        if ((queues[i].queueFlags & VK_QUEUE_COMPUTE_BIT)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 const bool VulkanInstance::supportVulkan() const {
-    uint32_t gpuCount = 0;
-    auto res          = enumeratePhysicalDevices(gpuCount, nullptr);
-    if ((0 == gpuCount) || (VK_SUCCESS != res)) {
+    uint32_t gpuCount = 1;
+    VkPhysicalDevice vulkanDevices[1];
+    auto res          = enumeratePhysicalDevices(gpuCount, vulkanDevices);
+    if ((0 == gpuCount) || (VK_SUCCESS != res) || !getPhysicalDeviceComputeQueueSupport(vulkanDevices[0])) {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
