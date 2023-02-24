@@ -21,7 +21,9 @@ public:
     const VkResult enumeratePhysicalDevices(uint32_t& physicalDeviceCount, VkPhysicalDevice* pPhysicalDevices) const;
     void getPhysicalDeviceQueueFamilyProperties(const VkPhysicalDevice& physicalDevice,
                                                 uint32_t& queueFamilyPropertyCount,
-                                                VkQueueFamilyProperties* pQueueFamilyProperties);
+                                                VkQueueFamilyProperties* pQueueFamilyProperties) const;
+
+    bool getPhysicalDeviceComputeQueueSupport(const VkPhysicalDevice& physicalDevice) const;
 
     const bool supportVulkan() const;
 
