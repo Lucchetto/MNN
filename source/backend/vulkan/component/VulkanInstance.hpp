@@ -23,7 +23,7 @@ public:
                                                 uint32_t& queueFamilyPropertyCount,
                                                 VkQueueFamilyProperties* pQueueFamilyProperties) const;
 
-    bool getPhysicalDeviceComputeQueueSupport(const VkPhysicalDevice& physicalDevice) const;
+    bool getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice& physicalDevice) const;
 
     const bool supportVulkan() const;
 
