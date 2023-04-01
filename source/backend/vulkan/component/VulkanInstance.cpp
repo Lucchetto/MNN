@@ -72,10 +72,13 @@ bool VulkanInstance::getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice
 }
 
 const bool VulkanInstance::supportVulkan() const {
-    uint32_t gpuCount = 1;
-    VkPhysicalDevice vulkanDevices[1];
-    auto res          = enumeratePhysicalDevices(gpuCount, vulkanDevices);
-    if ((0 == gpuCount) || (VK_SUCCESS != res) || !getPhysicalDeviceHasRequiredFeatures(vulkanDevices[0])) {
+    uint32_t gpuCount = 0;
+    if (enumeratePhysicalDevices(gpuCount, nullptr) != VK_SUCCESS || gpuCount < 1) {
+        MNN_ERROR("Invalide device for support vulkan\n");
+        return false;
+    }
+    VkPhysicalDevice vulkanDevices[gpuCount];
+    if (enumeratePhysicalDevices(gpuCount, vulkanDevices) != VK_SUCCESS || !getPhysicalDeviceHasRequiredFeatures(vulkanDevices[0])) {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
