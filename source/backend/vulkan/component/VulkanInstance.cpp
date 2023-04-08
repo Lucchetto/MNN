@@ -71,14 +71,15 @@ bool VulkanInstance::getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice
     return deviceFeatures.shaderStorageImageWriteWithoutFormat == VK_TRUE;
 }
 
-const bool VulkanInstance::supportVulkan() const {
+bool VulkanInstance::supportVulkan() const {
     uint32_t gpuCount = 0;
     if (enumeratePhysicalDevices(gpuCount, nullptr) != VK_SUCCESS || gpuCount < 1) {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
-    VkPhysicalDevice vulkanDevices[gpuCount];
-    if (enumeratePhysicalDevices(gpuCount, vulkanDevices) != VK_SUCCESS || !getPhysicalDeviceHasRequiredFeatures(vulkanDevices[0])) {
+    std::vector<VkPhysicalDevice> vulkanDevices;
+    vulkanDevices.reserve(gpuCount);
+    if (enumeratePhysicalDevices(gpuCount, vulkanDevices.data()) != VK_SUCCESS || !getPhysicalDeviceHasRequiredFeatures(vulkanDevices[0])) {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
