@@ -36,7 +36,7 @@ public:
     }
 };
 static const auto __cuda_global_initializer = []() {
-    MNNInsertExtraRuntimeCreator(MNN_FORWARD_CUDA, new CUDARuntimeCreator, false);
+    MNNInsertExtraRuntimeCreator(MNN_FORWARD_CUDA, new CUDARuntimeCreator, true);
     return true;
 }();
 
