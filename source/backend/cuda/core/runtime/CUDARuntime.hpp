@@ -130,6 +130,8 @@ private:
     float mFlops            = 4.0f;
     bool mIsCreateError{false};
     size_t mThreadPerBlock = 128;
+
+    int getBestCudaDevice() const;
 };
 
 } // namespace MNN
