@@ -280,7 +280,7 @@ void VulkanBackend::onCopyBuffer(const Tensor* srcTensor, const Tensor* dstTenso
         tempTensor->buffer().type = dstTensor->buffer().type;
         auto size = VulkanTensor::getAlignSize(tempTensor.get()) * sizeof(float);
         // host->gpu
-        _allocHostBuffer(size);
+        _allocHostBuffer(size, false);
         tempTensor->buffer().host = (uint8_t*)mHostBuffer->map();
         MNNCPUCopyBuffer(srcTensor, tempTensor.get());
         mHostBuffer->unmap();
@@ -313,7 +313,7 @@ void VulkanBackend::onCopyBuffer(const Tensor* srcTensor, const Tensor* dstTenso
         // gpu->host
         auto size = VulkanTensor::getAlignSize(srcTensor) * sizeof(float);
         _finish();
-        _allocHostBuffer(size);
+        _allocHostBuffer(size, true);
         auto format = TensorUtils::getDescribe(srcTensor)->dimensionFormat;
         auto key    = std::make_tuple(srcTensor, false, format);
 
@@ -411,13 +411,18 @@ void VulkanBackend::onCopyBuffer(const Tensor* srcTensor, const Tensor* dstTenso
     }
 }
 
-void VulkanBackend::_allocHostBuffer(size_t size) const {
+void VulkanBackend::_allocHostBuffer(size_t size, bool hostCached) const {
+    VkFlags requirements = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+    if (hostCached) {
+        requirements |= VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
+    }
+
     if (mHostBuffer.get() == nullptr || mHostBuffer->size() < size) {
         mHostBuffer.reset(new VulkanBuffer(getMemoryPool(), false, size, nullptr,
                                           VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
                                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
                                           VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                           VK_SHARING_MODE_EXCLUSIVE, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+                                           VK_SHARING_MODE_EXCLUSIVE, requirements));
         mConverters.clear();
     }
 }
