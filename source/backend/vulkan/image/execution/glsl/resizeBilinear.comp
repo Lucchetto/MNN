@@ -12,38 +12,32 @@ layout(set = 0, binding = 2) uniform reluBuffer{
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-void main()
-{
-	ivec3 pos = ivec3(gl_GlobalInvocationID);
-	// input output layout is NC4HW4
+void main() {
+    ivec2 outTexel = ivec2(gl_GlobalInvocationID.xy);
 
-	ivec3 inputImgSize = uResizeParam.inImgSize.xyz;
-	ivec3 outputImgSize = uResizeParam.outImgSize.xyz;
+    if (outTexel.x >= uResizeParam.outImgSize.x || outTexel.y >= uResizeParam.outImgSize.y) {
+        return;
+    }
 
-    if(pos.x < outputImgSize.x && pos.y < outputImgSize.y)
-	{
-		float srcX = float(pos.x) * uResizeParam.scale.x + uResizeParam.scale.y;
-		int x1 = int(floor(srcX));
-		int x11 = clamp(x1, 0, inputImgSize.x - 1);
-		int x12 = clamp(x1 + 1, 0, inputImgSize.x - 1);
-		vec4 factorX = vec4(srcX - float(x1));
+    vec2 texCoord = (vec2(outTexel) + 0.5) / vec2(uResizeParam.outImgSize.xy);
+    vec2 texelSize = 1.0 / vec2(uResizeParam.inImgSize.xy);
 
-		float srcY = float(pos.y) * uResizeParam.scale.z + uResizeParam.scale.w;
-		int y1 = int(floor(srcY));
-		int y11 = clamp(y1, 0, inputImgSize.y - 1);
-		int y12 = clamp(y1 + 1, 0, inputImgSize.y - 1);
-		vec4 factorY = vec4(srcY - float(y1));
-        int sz = pos.z % inputImgSize.z;
-        int sb = pos.z / inputImgSize.z;
+    // Calculate the four texels that surround the desired texel
+    vec2 texelFloor = floor(texCoord * vec2(uResizeParam.inImgSize.xy));
+    vec2 texelFraction = fract(texCoord * vec2(uResizeParam.inImgSize.xy));
 
-		vec4 res1 = texelFetch(uInput, ivec2(x11+sz*inputImgSize.x, y12+sb*inputImgSize.y), 0);
-		vec4 res2 = texelFetch(uInput, ivec2(x12+sz*inputImgSize.x, y12+sb*inputImgSize.y), 0);
-		vec4 res3 = texelFetch(uInput, ivec2(x11+sz*inputImgSize.x, y11+sb*inputImgSize.y), 0);
-		vec4 res4 = texelFetch(uInput, ivec2(x12+sz*inputImgSize.x, y11+sb*inputImgSize.y), 0);
-		vec4 res11 = (vec4(1.0) - factorX) * res1 + factorX * res2;
-		vec4 res12 = (vec4(1.0) - factorX) * res3 + factorX * res4;
-		
-		imageStore(uOutput, ivec2(pos.x+sz*outputImgSize.x, pos.y+sb*outputImgSize.y), factorY * res11 + (vec4(1.0) - factorY) * res12);
-	}
+    vec4 texel00 = texture(uInput, (texelFloor + vec2(0.0, 0.0)) * texelSize);
+    vec4 texel10 = texture(uInput, (texelFloor + vec2(1.0, 0.0)) * texelSize);
+    vec4 texel01 = texture(uInput, (texelFloor + vec2(0.0, 1.0)) * texelSize);
+    vec4 texel11 = texture(uInput, (texelFloor + vec2(1.0, 1.0)) * texelSize);
 
+    // Bilinear interpolation
+    vec4 interpolatedColor = mix(
+        mix(texel00, texel10, texelFraction.x),
+        mix(texel01, texel11, texelFraction.x),
+        texelFraction.y
+    );
+
+    // Write the interpolated color to the output image
+    imageStore(uOutput, outTexel, interpolatedColor);
 }
