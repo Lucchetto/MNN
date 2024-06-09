@@ -147,6 +147,8 @@ private:
     std::vector<uint8_t> mBuffer;
     const void* mCacheOutside = nullptr;
     size_t mCacheOutsideSize = 0;
+
+    int getBestCudaDevice() const;
 };
 
 } // namespace MNN

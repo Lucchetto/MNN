@@ -26,26 +26,37 @@ bool CUDARuntime::isCreateError() const {
     return mIsCreateError;
 }
 
+int CUDARuntime::getBestCudaDevice() const {
+    int deviceCount = 0;
+    cudaGetDeviceCount(&deviceCount);
+
+    cudaDeviceProp deviceProp;
+    int bestDeviceId = -1;
+    size_t maxTotalGlobalMem = 0;
+    for (int i = 0; i < deviceCount; i++) {
+        cuda_check(cudaGetDeviceProperties(&deviceProp, i));
+        if (deviceProp.major > 7 || (deviceProp.major == 7 && deviceProp.minor >= 6)) {
+            if (deviceProp.totalGlobalMem > maxTotalGlobalMem) {
+                bestDeviceId = i;
+            }
+        }
+    }
+    return bestDeviceId;
+}
+
 CUDARuntime::CUDARuntime(int device_id) {
 #ifdef LOG_VERBOSE
     MNN_PRINT("start CUDARuntime id:%d\n", device_id);
 #endif
-    int version;
-    cuda_check(cudaRuntimeGetVersion(&version));
-    int id = device_id;
-    cuda_check(cudaGetDeviceCount(&mDeviceCount));
+    const int selectedDeviceId = getBestCudaDevice();
 
-    if (mDeviceCount > 0) {
-        if (id < 0 || id >= mDeviceCount) {
-            cuda_check(cudaGetDevice(&id));
-        }
-
+    if (selectedDeviceId > -1) {
         // printf("use GPU device id:%d\n", id);
         // id = selectDeviceMaxFreeMemory();
-        cuda_check(cudaSetDevice(id));
+        cuda_check(cudaSetDevice(selectedDeviceId));
 
-        mDeviceId = id;
-        cuda_check(cudaGetDeviceProperties(&mProp, id));
+        mDeviceId = selectedDeviceId;
+        cuda_check(cudaGetDeviceProperties(&mProp, selectedDeviceId));
         MNN_ASSERT(mProp.maxThreadsPerBlock > 0);
     } else {
         mIsCreateError = true;
