@@ -34,17 +34,22 @@ CUDARuntime::CUDARuntime(int device_id) {
     cuda_check(cudaRuntimeGetVersion(&version));
     int id = device_id;
     cuda_check(cudaGetDeviceCount(&mDeviceCount));
-    if (id < 0 || id >= mDeviceCount) {
-        cuda_check(cudaGetDevice(&id));
-    }
-    
-    // printf("use GPU device id:%d\n", id);
-    // id = selectDeviceMaxFreeMemory();
-    cuda_check(cudaSetDevice(id));
 
-    mDeviceId = id;
-    cuda_check(cudaGetDeviceProperties(&mProp, id));
-    MNN_ASSERT(mProp.maxThreadsPerBlock > 0);
+    if (mDeviceCount > 0) {
+        if (id < 0 || id >= mDeviceCount) {
+            cuda_check(cudaGetDevice(&id));
+        }
+
+        // printf("use GPU device id:%d\n", id);
+        // id = selectDeviceMaxFreeMemory();
+        cuda_check(cudaSetDevice(id));
+
+        mDeviceId = id;
+        cuda_check(cudaGetDeviceProperties(&mProp, id));
+        MNN_ASSERT(mProp.maxThreadsPerBlock > 0);
+    } else {
+        mIsCreateError = true;
+    }
 }
 
 CUDARuntime::~CUDARuntime() {
