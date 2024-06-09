@@ -40,7 +40,7 @@ public:
 bool placeholder = []() {
     static std::once_flag createOnce;
     std::call_once(createOnce, []() {
-        MNNInsertExtraRuntimeCreator(MNN_FORWARD_CUDA, new CUDARuntimeCreator, false);
+        MNNInsertExtraRuntimeCreator(MNN_FORWARD_CUDA, new CUDARuntimeCreator, true);
     });
     return true;
 }();
