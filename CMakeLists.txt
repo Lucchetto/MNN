@@ -717,6 +717,9 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tools/converter)
 # Merge MNN/MNNExpress/MNNOpenCV and other backends into one .lib/.dll on Windows
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tools/cv)
 IF(MNN_BUILD_OPENCV AND NOT MNN_SEP_BUILD)
+  IF(MSVC)
+    target_compile_definitions(MNNOpenCV PRIVATE "-DBUILDING_MNN_DLL" INTERFACE "-DUSING_MNN_DLL")
+  ENDIF()
   target_sources(MNN PRIVATE $<TARGET_OBJECTS:MNNOpenCV>)
 ENDIF()
 
