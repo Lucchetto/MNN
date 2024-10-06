@@ -65,10 +65,30 @@ void VulkanInstance::getPhysicalDeviceQueueFamilyProperties(const VkPhysicalDevi
 }
 
 bool VulkanInstance::getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice& physicalDevice) const {
+    // Check for the physical device features
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
 
-    return deviceFeatures.shaderStorageImageWriteWithoutFormat == VK_TRUE;
+    // We need shaderStorageImageWriteWithoutFormat support
+    if (!deviceFeatures.shaderStorageImageWriteWithoutFormat) {
+        return false;
+    }
+
+    // Check if there is a queue family that supports compute
+    uint32_t queueFamilyCount = 0;
+    getPhysicalDeviceQueueFamilyProperties(physicalDevice, queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    getPhysicalDeviceQueueFamilyProperties(physicalDevice, queueFamilyCount, queueFamilies.data());
+
+    for (const auto &queueFamily: queueFamilies) {
+        if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+            // Device supports compute queue, we're good
+            return true;
+        }
+    }
+
+    // No compute queue found
+    return false;
 }
 
 bool VulkanInstance::supportVulkan() const {
