@@ -177,27 +177,27 @@ static bool _testVulkan() {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
-    if (!instance->supportVulkan()) {
+    if (instance->findSupportedVulkanDevice() == VK_NULL_HANDLE) {
         MNN_ERROR("Invalide device for support vulkan\n");
         return false;
     }
     return true;
 }
 
-class VulkanRuntimeCreator : public RuntimeCreator {
-public:
-    virtual Runtime* onCreate(const Backend::Info& info) const {
-        if (InitVulkan()) {
-            if (_testVulkan()) {
-                return new VulkanRuntime(info);
+    class VulkanRuntimeCreator : public RuntimeCreator {
+    public:
+        virtual Runtime* onCreate(const Backend::Info& info) const {
+            if (InitVulkan()) {
+                if (_testVulkan()) {
+                    return new VulkanRuntime(info);
+                }
             }
+            return nullptr;
         }
-        return nullptr;
-    }
-    virtual bool onValid(Backend::Info& info) const {
-        return true;
-    }
-};
+        virtual bool onValid(Backend::Info& info) const {
+            return true;
+        }
+    };
 
 static bool gResistor = []() {
     MNNInsertExtraRuntimeCreator(MNN_FORWARD_VULKAN, new VulkanRuntimeCreator, false);

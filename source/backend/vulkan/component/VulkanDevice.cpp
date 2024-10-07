@@ -10,26 +10,16 @@
 #include <string.h>
 //#define MNN_VULKAN_PRINT_EXT
 namespace MNN {
-VulkanDevice::VulkanDevice(std::shared_ptr<VulkanInstance> instance, const std::vector<const char*>& device_extensions)
-    : mOwner(true),
-      mInstance(instance),
-      mQueueFamilyIndex(0),
-      mPhysicalDevice(VK_NULL_HANDLE),
-      mDevice(VK_NULL_HANDLE),
-      mQueue(VK_NULL_HANDLE) {
-    MNN_ASSERT(mInstance->success());
-    // Find one GPU to use:
-    // On Android, every GPU device is equal -- supporting
-    // graphics/compute/present
-    // for this sample, we use the very first GPU device found on the system
-    uint32_t gpuCount = 0;
-    CALL_VK(mInstance->enumeratePhysicalDevices(gpuCount, nullptr));
-    MNN_ASSERT(0 != gpuCount);
-    std::vector<VkPhysicalDevice> tmpGpus;
-    tmpGpus.reserve(gpuCount);
-    CALL_VK(mInstance->enumeratePhysicalDevices(gpuCount, tmpGpus.data()));
-    MNN_ASSERT(nullptr != tmpGpus[0]);
-    mPhysicalDevice = tmpGpus[0];
+    VulkanDevice::VulkanDevice(std::shared_ptr<VulkanInstance> instance, const std::vector<const char*>& device_extensions)
+            : mOwner(true),
+              mInstance(instance),
+              mQueueFamilyIndex(0),
+              mPhysicalDevice(VK_NULL_HANDLE),
+              mDevice(VK_NULL_HANDLE),
+              mQueue(VK_NULL_HANDLE) {
+        MNN_ASSERT(mInstance->success());
+        mPhysicalDevice = instance->findSupportedVulkanDevice();
+        MNN_ASSERT(VK_NULL_HANDLE != mPhysicalDevice);
 
     // Find a GFX queue family
     uint32_t queueFamilyCount = 1;

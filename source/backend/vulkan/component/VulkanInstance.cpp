@@ -91,18 +91,38 @@ bool VulkanInstance::getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice
     return false;
 }
 
-bool VulkanInstance::supportVulkan() const {
+VkPhysicalDevice VulkanInstance::findSupportedVulkanDevice() const {
     uint32_t gpuCount = 0;
     if (enumeratePhysicalDevices(gpuCount, nullptr) != VK_SUCCESS || gpuCount < 1) {
         MNN_ERROR("Invalide device for support vulkan\n");
-        return false;
+        return VK_NULL_HANDLE;
     }
-    std::vector<VkPhysicalDevice> vulkanDevices;
-    vulkanDevices.reserve(gpuCount);
-    if (enumeratePhysicalDevices(gpuCount, vulkanDevices.data()) != VK_SUCCESS || !getPhysicalDeviceHasRequiredFeatures(vulkanDevices[0])) {
+
+    std::vector<VkPhysicalDevice> vulkanDevices(gpuCount);
+    if (enumeratePhysicalDevices(gpuCount, vulkanDevices.data()) != VK_SUCCESS) {
         MNN_ERROR("Invalide device for support vulkan\n");
-        return false;
+        return VK_NULL_HANDLE;
     }
-    return true;
+
+    VkPhysicalDevice bestDevice = VK_NULL_HANDLE;
+    for (int i = 0; i < vulkanDevices.size(); i++) {
+        const auto &device = vulkanDevices[i];
+
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        if (!getPhysicalDeviceHasRequiredFeatures(device)) {
+            // Skip unsupported GPU
+            continue;
+        } else if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            // Prefer discrete GPU
+            bestDevice = device;
+            break;
+        } else if (i == 0) {
+            // Use first GPU as fallback when no discrete GPUs are found
+            bestDevice = device;
+        }
+    }
+
+    return bestDevice;
 }
 } // namespace MNN

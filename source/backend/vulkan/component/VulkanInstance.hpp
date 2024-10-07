@@ -25,7 +25,7 @@ public:
 
     bool getPhysicalDeviceHasRequiredFeatures(const VkPhysicalDevice& physicalDevice) const;
 
-    bool supportVulkan() const;
+    VkPhysicalDevice findSupportedVulkanDevice() const;
 
     VkInstance get() const {
         return mInstance;
